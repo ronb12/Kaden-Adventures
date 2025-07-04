@@ -1,0 +1,22 @@
+# Godot files
+*.gd
+*.tscn
+*.godot
+*.uid
+*.import
+.godot/
+
+# System files
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp 
