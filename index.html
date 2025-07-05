@@ -10,6 +10,78 @@
         input[type=number] { width: 60px; padding: 5px; font-size: 1.2em; }
         button { padding: 8px 16px; font-size: 1em; margin-left: 10px; }
         #message { margin-top: 20px; font-size: 1.2em; }
+        #gameArea {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            margin: 30px auto;
+            border: 3px solid #ffb300;
+            border-radius: 15px;
+            width: 400px;
+            height: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+        #player {
+            width: 60px;
+            height: 80px;
+            background: url('./sprites/player.png') center/cover no-repeat, #29b6f6;
+            position: absolute;
+            bottom: 10px;
+            left: 170px;
+            transition: left 0.1s, filter 0.2s;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+        .coin {
+            width: 30px;
+            height: 30px;
+            background: url('./sprites/coin.png') center/cover no-repeat, gold;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
+        }
+        .powerup {
+            width: 30px;
+            height: 30px;
+            background: url('./sprites/powerup.png') center/cover no-repeat, linear-gradient(45deg, #ff6b35, #f7931e);
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            animation: pulse 0.5s infinite alternate;
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.5);
+        }
+        .enemy {
+            width: 25px;
+            height: 25px;
+            background: url('./sprites/enemy.png') center/cover no-repeat, #d32f2f;
+            border-radius: 5px;
+            position: absolute;
+            top: 0;
+            animation: shake 0.2s infinite;
+            box-shadow: 0 2px 8px rgba(211, 47, 47, 0.5);
+        }
+        .boss {
+            width: 80px;
+            height: 40px;
+            background: url('./sprites/boss.png') center/cover no-repeat, #9c27b0;
+            border-radius: 10px;
+            position: absolute;
+            top: 0;
+            animation: bossFloat 2s infinite;
+            box-shadow: 0 4px 16px rgba(156, 39, 176, 0.5);
+        }
+        body {
+            background: #1e3c72;
+            background-image: radial-gradient(circle at 20% 20%, #fff 1px, transparent 1px),
+                              radial-gradient(circle at 80% 80%, #fff 1px, transparent 1px),
+                              linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background-size: 400px 400px, 400px 400px, 100% 100%;
+            animation: bgmove 20s linear infinite;
+        }
+        @keyframes bgmove {
+            0% { background-position: 0 0, 0 0, 0 0; }
+            100% { background-position: 400px 400px, -400px -400px, 0 0; }
+        }
     </style>
 </head>
 <body>
@@ -114,16 +186,53 @@
         #player {
             width: 60px;
             height: 80px;
-            background: url('sprites/player.png') center/cover no-repeat;
+            background: url('./sprites/player.png') center/cover no-repeat, #29b6f6;
             position: absolute;
             bottom: 10px;
             left: 170px;
             transition: left 0.1s, filter 0.2s;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
         }
-        .coin { width: 30px; height: 30px; background: gold; border-radius: 50%; position: absolute; top: 0; }
-        .powerup { width: 30px; height: 30px; background: linear-gradient(45deg, #ff6b35, #f7931e); border-radius: 50%; position: absolute; top: 0; animation: pulse 0.5s infinite alternate; }
-        .enemy { width: 25px; height: 25px; background: #d32f2f; border-radius: 5px; position: absolute; top: 0; animation: shake 0.2s infinite; }
-        .boss { width: 80px; height: 40px; background: #9c27b0; border-radius: 10px; position: absolute; top: 0; animation: bossFloat 2s infinite; }
+        .coin {
+            width: 30px;
+            height: 30px;
+            background: url('./sprites/coin.png') center/cover no-repeat, gold;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
+        }
+        .powerup {
+            width: 30px;
+            height: 30px;
+            background: url('./sprites/powerup.png') center/cover no-repeat, linear-gradient(45deg, #ff6b35, #f7931e);
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            animation: pulse 0.5s infinite alternate;
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.5);
+        }
+        .enemy {
+            width: 25px;
+            height: 25px;
+            background: url('./sprites/enemy.png') center/cover no-repeat, #d32f2f;
+            border-radius: 5px;
+            position: absolute;
+            top: 0;
+            animation: shake 0.2s infinite;
+            box-shadow: 0 2px 8px rgba(211, 47, 47, 0.5);
+        }
+        .boss {
+            width: 80px;
+            height: 40px;
+            background: url('./sprites/boss.png') center/cover no-repeat, #9c27b0;
+            border-radius: 10px;
+            position: absolute;
+            top: 0;
+            animation: bossFloat 2s infinite;
+            box-shadow: 0 4px 16px rgba(156, 39, 176, 0.5);
+        }
         .particle { width: 4px; height: 4px; background: #ffeb3b; border-radius: 50%; position: absolute; }
         .shield { width: 80px; height: 40px; border: 3px solid #2196f3; border-radius: 15px; position: absolute; bottom: 5px; left: 165px; }
         @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.2); } }
