@@ -3,161 +3,740 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaden's Adventures - 2D Action Adventure</title>
+    <title>Coin Collector Game</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            font-family: 'Arial', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-        }
-        
-        #gameContainer {
-            position: relative;
-            border: 3px solid #gold;
-            border-radius: 10px;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
-            background: #000;
-        }
-        
-        #gameCanvas {
-            display: block;
-            background: #000;
-        }
-        
-        #ui {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: white;
-            font-size: 16px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            z-index: 100;
-        }
-        
-        #controls {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: none;
-            z-index: 100;
-        }
-        
-        .control-btn {
-            width: 60px;
-            height: 60px;
-            margin: 5px;
-            border: 2px solid #gold;
-            border-radius: 50%;
-            background: rgba(255, 215, 0, 0.3);
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            user-select: none;
-        }
-        
-        .control-btn:active {
-            background: rgba(255, 215, 0, 0.6);
-        }
-        
-        #startScreen, #gameOverScreen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            z-index: 200;
-        }
-        
-        .screen-title {
-            font-size: 48px;
-            margin-bottom: 20px;
-            color: #gold;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-        }
-        
-        .screen-btn {
-            padding: 15px 30px;
-            margin: 10px;
-            border: 2px solid #gold;
-            border-radius: 25px;
-            background: rgba(255, 215, 0, 0.2);
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .screen-btn:hover {
-            background: rgba(255, 215, 0, 0.4);
-            transform: scale(1.05);
-        }
-        
-        @media (max-width: 768px) {
-            #controls {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                max-width: 200px;
-            }
-            
-            .control-btn {
-                width: 50px;
-                height: 50px;
-                font-size: 16px;
-            }
-        }
+        body { font-family: Arial, sans-serif; background: #e0f7fa; text-align: center; margin-top: 50px; }
+        #game-box { background: #fff; padding: 30px; border-radius: 10px; display: inline-block; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        input[type=number] { width: 60px; padding: 5px; font-size: 1.2em; }
+        button { padding: 8px 16px; font-size: 1em; margin-left: 10px; }
+        #message { margin-top: 20px; font-size: 1.2em; }
     </style>
 </head>
 <body>
-    <div id="gameContainer">
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div id="game-box">
+        <h1>🪙 Coin Collector! 🪙</h1>
         
-        <div id="ui">
-            <div id="healthBar">Health: 100/100</div>
+        <!-- Main Menu -->
+        <div id="mainMenu">
+            <h2>Main Menu</h2>
+            <button onclick="showGame()">Play Game</button>
+            <button onclick="showSettings()">Settings</button>
+            <button onclick="showShop()">Shop</button>
+            <button onclick="showAchievements()">Achievements</button>
+            <button onclick="showStats()">Statistics</button>
+        </div>
+
+        <!-- Settings Panel -->
+        <div id="settingsPanel" style="display:none;">
+            <h2>⚙️ Settings</h2>
+            <div>
+                <label>Difficulty: </label>
+                <select id="difficulty">
+                    <option value="easy">Easy</option>
+                    <option value="normal" selected>Normal</option>
+                    <option value="hard">Hard</option>
+                    <option value="extreme">Extreme</option>
+                </select>
+            </div>
+            <div>
+                <label>Sound Effects: </label>
+                <input type="checkbox" id="soundEnabled" checked>
+            </div>
+            <div>
+                <label>Background Theme: </label>
+                <select id="backgroundTheme">
+                    <option value="default">Default</option>
+                    <option value="space">Space</option>
+                    <option value="forest">Forest</option>
+                    <option value="ocean">Ocean</option>
+                </select>
+            </div>
+            <div>
+                <label>Particle Effects: </label>
+                <input type="checkbox" id="particlesEnabled" checked>
+            </div>
+            <button onclick="saveSettings()">Save Settings</button>
+            <button onclick="showMainMenu()">Back to Menu</button>
+        </div>
+
+        <!-- Shop -->
+        <div id="shopPanel" style="display:none;">
+            <h2>🛒 Shop</h2>
+            <div>Coins: <span id="totalCoins">0</span></div>
+            <div class="shop-item">
+                <span>Extra Life (100 coins)</span>
+                <button onclick="buyExtraLife()">Buy</button>
+            </div>
+            <div class="shop-item">
+                <span>Shield (50 coins)</span>
+                <button onclick="buyShield()">Buy</button>
+            </div>
+            <div class="shop-item">
+                <span>Magnet (75 coins)</span>
+                <button onclick="buyMagnet()">Buy</button>
+            </div>
+            <button onclick="showMainMenu()">Back to Menu</button>
+        </div>
+
+        <!-- Achievements -->
+        <div id="achievementsPanel" style="display:none;">
+            <h2>🏆 Achievements</h2>
+            <div id="achievementsList"></div>
+            <button onclick="showMainMenu()">Back to Menu</button>
+        </div>
+
+        <!-- Statistics -->
+        <div id="statsPanel" style="display:none;">
+            <h2>📊 Statistics</h2>
+            <div id="statsList"></div>
+            <button onclick="showMainMenu()">Back to Menu</button>
+        </div>
+
+        <!-- Game UI -->
+        <div id="gameUI" style="display:none;">
             <div id="score">Score: 0</div>
-            <div id="lives">Lives: 3</div>
-        </div>
-        
-        <div id="controls">
-            <button class="control-btn" id="upBtn">↑</button>
-            <button class="control-btn" id="leftBtn">←</button>
-            <button class="control-btn" id="rightBtn">→</button>
-            <button class="control-btn" id="downBtn">↓</button>
-            <button class="control-btn" id="attackBtn">⚔</button>
-        </div>
-        
-        <div id="startScreen">
-            <h1 class="screen-title">Kaden's Adventures</h1>
-            <p style="margin-bottom: 30px; font-size: 18px;">2D Action Adventure</p>
-            <button class="screen-btn" onclick="startGame()">Start Game</button>
-            <button class="screen-btn" onclick="showInstructions()">Instructions</button>
-        </div>
-        
-        <div id="gameOverScreen" style="display: none;">
-            <h1 class="screen-title">Game Over</h1>
-            <p id="finalScore" style="margin-bottom: 30px; font-size: 24px;"></p>
-            <button class="screen-btn" onclick="restartGame()">Play Again</button>
-            <button class="screen-btn" onclick="showStartScreen()">Main Menu</button>
+            <div id="health">Health: 3</div>
+            <div id="combo">Combo: 0x</div>
+            <div id="level">Level: 1</div>
+            <div id="powerUpStatus" style="color: #ff6b35; font-weight: bold; margin-top: 5px;"></div>
+            <div id="gameArea">
+                <div id="player"></div>
+            </div>
+            <button id="startBtn" onclick="startGame()">Start Game</button>
+            <button id="pauseBtn" onclick="pauseGame()" style="display:none;">Pause</button>
+            <button id="restartBtn" onclick="restartGame()" style="display:none;">Restart</button>
+            <button onclick="showMainMenu()">Main Menu</button>
+            <div id="gameOver"></div>
         </div>
     </div>
-    
-    <script src="game.js"></script>
+    <style>
+        #gameArea { background: #fffde7; margin: 30px auto; border: 3px solid #ffb300; border-radius: 15px; width: 400px; height: 500px; position: relative; overflow: hidden; }
+        #player {
+            width: 60px;
+            height: 80px;
+            background: url('sprites/player.png') center/cover no-repeat;
+            position: absolute;
+            bottom: 10px;
+            left: 170px;
+            transition: left 0.1s, filter 0.2s;
+        }
+        .coin { width: 30px; height: 30px; background: gold; border-radius: 50%; position: absolute; top: 0; }
+        .powerup { width: 30px; height: 30px; background: linear-gradient(45deg, #ff6b35, #f7931e); border-radius: 50%; position: absolute; top: 0; animation: pulse 0.5s infinite alternate; }
+        .enemy { width: 25px; height: 25px; background: #d32f2f; border-radius: 5px; position: absolute; top: 0; animation: shake 0.2s infinite; }
+        .boss { width: 80px; height: 40px; background: #9c27b0; border-radius: 10px; position: absolute; top: 0; animation: bossFloat 2s infinite; }
+        .particle { width: 4px; height: 4px; background: #ffeb3b; border-radius: 50%; position: absolute; }
+        .shield { width: 80px; height: 40px; border: 3px solid #2196f3; border-radius: 15px; position: absolute; bottom: 5px; left: 165px; }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.2); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
+        @keyframes bossFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        #score { font-size: 1.5em; color: #388e3c; margin-top: 10px; }
+        #health { font-size: 1.5em; color: #d32f2f; margin-top: 5px; }
+        #combo { font-size: 1.2em; color: #ff9800; margin-top: 5px; }
+        #level { font-size: 1.2em; color: #673ab7; margin-top: 5px; }
+        #startBtn, #restartBtn, #pauseBtn { padding: 10px 20px; font-size: 1.1em; background: #ffb300; border: none; border-radius: 8px; color: #fff; cursor: pointer; margin-top: 20px; }
+        #gameOver { font-size: 1.3em; color: #d32f2f; margin-top: 20px; }
+        .shop-item { margin: 10px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .achievement { margin: 5px 0; padding: 5px; background: #f0f0f0; border-radius: 3px; }
+        .achievement.unlocked { background: #4caf50; color: white; }
+    </style>
+    <script>
+        // Game state variables
+        const gameArea = document.getElementById('gameArea');
+        const player = document.getElementById('player');
+        const scoreDisplay = document.getElementById('score');
+        const healthDisplay = document.getElementById('health');
+        const comboDisplay = document.getElementById('combo');
+        const levelDisplay = document.getElementById('level');
+        const powerUpStatus = document.getElementById('powerUpStatus');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const gameOverDisplay = document.getElementById('gameOver');
+        
+        let score = 0;
+        let health = 3;
+        let combo = 0;
+        let level = 1;
+        let totalCoins = 0;
+        let gameInterval, coinInterval, powerUpInterval, enemyInterval, bossInterval;
+        let coins = [];
+        let powerUps = [];
+        let enemies = [];
+        let bosses = [];
+        let particles = [];
+        let playerPos = 170;
+        let gameActive = false;
+        let gamePaused = false;
+        let gameDuration = 30;
+        let timer;
+        let powerUpActive = false;
+        let powerUpTimer;
+        let invulnerable = false;
+        let shieldActive = false;
+        let magnetActive = false;
+        let bossHealth = 0;
+        
+        // Settings
+        let settings = {
+            difficulty: 'normal',
+            soundEnabled: true,
+            backgroundTheme: 'default',
+            particlesEnabled: true
+        };
+        
+        // Achievements
+        let achievements = {
+            firstCoin: { name: "First Coin", description: "Collect your first coin", unlocked: false },
+            coinMaster: { name: "Coin Master", description: "Collect 100 coins in one game", unlocked: false },
+            survivor: { name: "Survivor", description: "Survive for 30 seconds", unlocked: false },
+            comboKing: { name: "Combo King", description: "Get a 10x combo", unlocked: false },
+            bossSlayer: { name: "Boss Slayer", description: "Defeat a boss", unlocked: false }
+        };
+        
+        // Statistics
+        let stats = {
+            gamesPlayed: 0,
+            totalScore: 0,
+            totalCoinsCollected: 0,
+            bossesDefeated: 0,
+            bestCombo: 0
+        };
+
+        // Menu functions
+        function showMainMenu() {
+            document.getElementById('mainMenu').style.display = 'block';
+            document.getElementById('settingsPanel').style.display = 'none';
+            document.getElementById('shopPanel').style.display = 'none';
+            document.getElementById('achievementsPanel').style.display = 'none';
+            document.getElementById('statsPanel').style.display = 'none';
+            document.getElementById('gameUI').style.display = 'none';
+        }
+
+        function showGame() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('gameUI').style.display = 'block';
+            loadSettings();
+        }
+
+        function showSettings() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('settingsPanel').style.display = 'block';
+            loadSettings();
+        }
+
+        function showShop() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('shopPanel').style.display = 'block';
+            document.getElementById('totalCoins').textContent = totalCoins;
+        }
+
+        function showAchievements() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('achievementsPanel').style.display = 'block';
+            displayAchievements();
+        }
+
+        function showStats() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('statsPanel').style.display = 'block';
+            displayStats();
+        }
+
+        function loadSettings() {
+            document.getElementById('difficulty').value = settings.difficulty;
+            document.getElementById('soundEnabled').checked = settings.soundEnabled;
+            document.getElementById('backgroundTheme').value = settings.backgroundTheme;
+            document.getElementById('particlesEnabled').checked = settings.particlesEnabled;
+        }
+
+        function saveSettings() {
+            settings.difficulty = document.getElementById('difficulty').value;
+            settings.soundEnabled = document.getElementById('soundEnabled').checked;
+            settings.backgroundTheme = document.getElementById('backgroundTheme').value;
+            settings.particlesEnabled = document.getElementById('particlesEnabled').checked;
+            applyBackgroundTheme();
+        }
+
+        function applyBackgroundTheme() {
+            const gameArea = document.getElementById('gameArea');
+            switch(settings.backgroundTheme) {
+                case 'space':
+                    gameArea.style.background = 'linear-gradient(to bottom, #0a0a2a, #1a1a4a)';
+                    break;
+                case 'forest':
+                    gameArea.style.background = 'linear-gradient(to bottom, #2d5a27, #4a7c59)';
+                    break;
+                case 'ocean':
+                    gameArea.style.background = 'linear-gradient(to bottom, #006994, #0099cc)';
+                    break;
+                default:
+                    gameArea.style.background = '#fffde7';
+            }
+        }
+
+        // Shop functions
+        function buyExtraLife() {
+            if (totalCoins >= 100) {
+                totalCoins -= 100;
+                health++;
+                healthDisplay.textContent = 'Health: ' + health;
+                document.getElementById('totalCoins').textContent = totalCoins;
+                if (settings.soundEnabled) playSound(1000, 0.2);
+            }
+        }
+
+        function buyShield() {
+            if (totalCoins >= 50) {
+                totalCoins -= 50;
+                activateShield();
+                document.getElementById('totalCoins').textContent = totalCoins;
+            }
+        }
+
+        function buyMagnet() {
+            if (totalCoins >= 75) {
+                totalCoins -= 75;
+                activateMagnet();
+                document.getElementById('totalCoins').textContent = totalCoins;
+            }
+        }
+
+        function activateShield() {
+            shieldActive = true;
+            const shield = document.createElement('div');
+            shield.className = 'shield';
+            shield.id = 'shield';
+            gameArea.appendChild(shield);
+            setTimeout(() => {
+                if (document.getElementById('shield')) {
+                    document.getElementById('shield').remove();
+                    shieldActive = false;
+                }
+            }, 5000);
+        }
+
+        function activateMagnet() {
+            magnetActive = true;
+            powerUpStatus.textContent = '🧲 MAGNET ACTIVE! 🧲';
+            setTimeout(() => {
+                magnetActive = false;
+                powerUpStatus.textContent = '';
+            }, 8000);
+        }
+
+        // Achievement functions
+        function displayAchievements() {
+            const list = document.getElementById('achievementsList');
+            list.innerHTML = '';
+            for (let key in achievements) {
+                const achievement = achievements[key];
+                const div = document.createElement('div');
+                div.className = `achievement ${achievement.unlocked ? 'unlocked' : ''}`;
+                div.innerHTML = `<strong>${achievement.name}</strong>: ${achievement.description}`;
+                list.appendChild(div);
+            }
+        }
+
+        function unlockAchievement(key) {
+            if (!achievements[key].unlocked) {
+                achievements[key].unlocked = true;
+                if (settings.soundEnabled) playSound(1500, 0.3);
+                powerUpStatus.textContent = `🏆 Achievement Unlocked: ${achievements[key].name}!`;
+                setTimeout(() => powerUpStatus.textContent = '', 3000);
+            }
+        }
+
+        // Statistics functions
+        function displayStats() {
+            const list = document.getElementById('statsList');
+            list.innerHTML = `
+                <div>Games Played: ${stats.gamesPlayed}</div>
+                <div>Total Score: ${stats.totalScore}</div>
+                <div>Total Coins Collected: ${stats.totalCoinsCollected}</div>
+                <div>Bosses Defeated: ${stats.bossesDefeated}</div>
+                <div>Best Combo: ${stats.bestCombo}x</div>
+            `;
+        }
+
+        // Sound effects
+        function playSound(frequency, duration, type = 'sine') {
+            if (!settings.soundEnabled) return;
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                oscillator.type = type;
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration);
+            } catch (e) {
+                console.log('Audio not supported');
+            }
+        }
+
+        // Particle effects
+        function createParticles(x, y, color = '#ffeb3b') {
+            if (!settings.particlesEnabled) return;
+            for (let i = 0; i < 5; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.background = color;
+                gameArea.appendChild(particle);
+                particles.push(particle);
+                
+                const angle = (Math.PI * 2 * i) / 5;
+                const velocity = 3;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity;
+                
+                let posX = x;
+                let posY = y;
+                const particleInterval = setInterval(() => {
+                    posX += vx;
+                    posY += vy;
+                    particle.style.left = posX + 'px';
+                    particle.style.top = posY + 'px';
+                    
+                    if (posY > 500 || posX < 0 || posX > 400) {
+                        clearInterval(particleInterval);
+                        if (particle.parentNode) particle.parentNode.removeChild(particle);
+                        particles.splice(particles.indexOf(particle), 1);
+                    }
+                }, 50);
+            }
+        }
+
+        // Game functions
+        function movePlayer(e) {
+            if (!gameActive || gamePaused) return;
+            if (e.key === 'ArrowLeft') {
+                playerPos = Math.max(0, playerPos - 30);
+            } else if (e.key === 'ArrowRight') {
+                playerPos = Math.min(340, playerPos + 30);
+            }
+            player.style.left = playerPos + 'px';
+            if (shieldActive) {
+                document.getElementById('shield').style.left = (playerPos - 5) + 'px';
+            }
+        }
+
+        function createCoin() {
+            const coin = document.createElement('div');
+            coin.className = 'coin';
+            coin.style.left = Math.floor(Math.random() * 370) + 'px';
+            coin.style.top = '0px';
+            gameArea.appendChild(coin);
+            coins.push(coin);
+        }
+
+        function createPowerUp() {
+            const powerUp = document.createElement('div');
+            powerUp.className = 'powerup';
+            powerUp.style.left = Math.floor(Math.random() * 370) + 'px';
+            powerUp.style.top = '0px';
+            gameArea.appendChild(powerUp);
+            powerUps.push(powerUp);
+        }
+
+        function createEnemy() {
+            const enemy = document.createElement('div');
+            enemy.className = 'enemy';
+            enemy.style.left = Math.floor(Math.random() * 375) + 'px';
+            enemy.style.top = '0px';
+            gameArea.appendChild(enemy);
+            enemies.push(enemy);
+        }
+
+        function createBoss() {
+            const boss = document.createElement('div');
+            boss.className = 'boss';
+            boss.style.left = '160px';
+            boss.style.top = '0px';
+            gameArea.appendChild(boss);
+            bosses.push(boss);
+            bossHealth = 10;
+        }
+
+        function updateCoins() {
+            for (let i = coins.length - 1; i >= 0; i--) {
+                const coin = coins[i];
+                let top = parseInt(coin.style.top);
+                let left = parseInt(coin.style.left);
+                
+                // Magnet effect
+                if (magnetActive && Math.abs(left - playerPos) < 100) {
+                    left += (playerPos - left) * 0.1;
+                    coin.style.left = left + 'px';
+                }
+                
+                top += 5;
+                coin.style.top = top + 'px';
+                
+                if (top > 460) {
+                    gameArea.removeChild(coin);
+                    coins.splice(i, 1);
+                    combo = 0;
+                    comboDisplay.textContent = 'Combo: 0x';
+                } else if (
+                    top > 430 &&
+                    left + 30 > playerPos &&
+                    left < playerPos + 60
+                ) {
+                    score += 10 * (combo + 1);
+                    combo++;
+                    totalCoins++;
+                    stats.totalCoinsCollected++;
+                    scoreDisplay.textContent = 'Score: ' + score;
+                    comboDisplay.textContent = 'Combo: ' + combo + 'x';
+                    playSound(800, 0.1);
+                    createParticles(left + 15, top + 15, 'gold');
+                    gameArea.removeChild(coin);
+                    coins.splice(i, 1);
+                    
+                    // Check achievements
+                    if (totalCoins === 1) unlockAchievement('firstCoin');
+                    if (combo > stats.bestCombo) stats.bestCombo = combo;
+                    if (combo >= 10) unlockAchievement('comboKing');
+                }
+            }
+        }
+
+        function updatePowerUps() {
+            for (let i = powerUps.length - 1; i >= 0; i--) {
+                const powerUp = powerUps[i];
+                let top = parseInt(powerUp.style.top);
+                top += 4;
+                powerUp.style.top = top + 'px';
+                
+                if (top > 460) {
+                    gameArea.removeChild(powerUp);
+                    powerUps.splice(i, 1);
+                } else if (
+                    top > 430 &&
+                    parseInt(powerUp.style.left) + 30 > playerPos &&
+                    parseInt(powerUp.style.left) < playerPos + 60
+                ) {
+                    activatePowerUp();
+                    playSound(1200, 0.3, 'square');
+                    createParticles(parseInt(powerUp.style.left) + 15, top + 15, '#ff6b35');
+                    gameArea.removeChild(powerUp);
+                    powerUps.splice(i, 1);
+                }
+            }
+        }
+
+        function updateEnemies() {
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                const enemy = enemies[i];
+                let top = parseInt(enemy.style.top);
+                top += 6;
+                enemy.style.top = top + 'px';
+                
+                if (top > 460) {
+                    gameArea.removeChild(enemy);
+                    enemies.splice(i, 1);
+                } else if (
+                    top > 430 &&
+                    parseInt(enemy.style.left) + 25 > playerPos &&
+                    parseInt(enemy.style.left) < playerPos + 60 &&
+                    !invulnerable && !shieldActive
+                ) {
+                    takeDamage();
+                    gameArea.removeChild(enemy);
+                    enemies.splice(i, 1);
+                }
+            }
+        }
+
+        function updateBosses() {
+            for (let i = bosses.length - 1; i >= 0; i--) {
+                const boss = bosses[i];
+                let top = parseInt(boss.style.top);
+                top += 2;
+                boss.style.top = top + 'px';
+                
+                if (top > 460) {
+                    gameArea.removeChild(boss);
+                    bosses.splice(i, 1);
+                } else if (
+                    top > 430 &&
+                    parseInt(boss.style.left) + 80 > playerPos &&
+                    parseInt(boss.style.left) < playerPos + 60 &&
+                    !invulnerable && !shieldActive
+                ) {
+                    takeDamage();
+                    bossHealth--;
+                    if (bossHealth <= 0) {
+                        stats.bossesDefeated++;
+                        unlockAchievement('bossSlayer');
+                        score += 500;
+                        scoreDisplay.textContent = 'Score: ' + score;
+                        createParticles(parseInt(boss.style.left) + 40, top + 20, '#9c27b0');
+                        gameArea.removeChild(boss);
+                        bosses.splice(i, 1);
+                    }
+                }
+            }
+        }
+
+        function takeDamage() {
+            if (invulnerable) return;
+            
+            health--;
+            healthDisplay.textContent = 'Health: ' + health;
+            playSound(200, 0.5, 'sawtooth');
+            
+            player.style.filter = 'grayscale(1)';
+            setTimeout(() => {
+                if (gameActive) player.style.filter = 'none';
+            }, 200);
+            
+            invulnerable = true;
+            player.style.opacity = '0.5';
+            setTimeout(() => {
+                invulnerable = false;
+                player.style.opacity = '1';
+            }, 1000);
+            
+            if (health <= 0) {
+                endGame();
+            }
+        }
+
+        function activatePowerUp() {
+            powerUpActive = true;
+            powerUpStatus.textContent = '🚀 SPEED BOOST! 🚀';
+            player.style.filter = 'hue-rotate(60deg)';
+            
+            if (powerUpTimer) clearTimeout(powerUpTimer);
+            
+            powerUpTimer = setTimeout(() => {
+                powerUpActive = false;
+                powerUpStatus.textContent = '';
+                player.style.filter = 'none';
+                playSound(400, 0.2);
+            }, 5000);
+        }
+
+        function pauseGame() {
+            if (gamePaused) {
+                gamePaused = false;
+                pauseBtn.textContent = 'Resume';
+                gameInterval = setInterval(() => {
+                    updateCoins();
+                    updatePowerUps();
+                    updateEnemies();
+                    updateBosses();
+                }, 20);
+            } else {
+                gamePaused = true;
+                pauseBtn.textContent = 'Pause';
+                clearInterval(gameInterval);
+            }
+        }
+
+        function startGame() {
+            score = 0;
+            health = 3;
+            combo = 0;
+            level = 1;
+            scoreDisplay.textContent = 'Score: 0';
+            healthDisplay.textContent = 'Health: 3';
+            comboDisplay.textContent = 'Combo: 0x';
+            levelDisplay.textContent = 'Level: 1';
+            powerUpStatus.textContent = '';
+            playerPos = 170;
+            player.style.left = playerPos + 'px';
+            player.style.filter = 'none';
+            player.style.opacity = '1';
+            startBtn.style.display = 'none';
+            pauseBtn.style.display = 'inline-block';
+            restartBtn.style.display = 'none';
+            gameOverDisplay.textContent = '';
+            gameActive = true;
+            gamePaused = false;
+            powerUpActive = false;
+            invulnerable = false;
+            shieldActive = false;
+            magnetActive = false;
+            
+            document.addEventListener('keydown', movePlayer);
+            gameInterval = setInterval(() => {
+                updateCoins();
+                updatePowerUps();
+                updateEnemies();
+                updateBosses();
+            }, 20);
+            
+            const difficulty = settings.difficulty;
+            const intervals = {
+                easy: { coin: 800, powerUp: 4000, enemy: 3000, boss: 15000 },
+                normal: { coin: 700, powerUp: 3000, enemy: 2000, boss: 12000 },
+                hard: { coin: 600, powerUp: 2500, enemy: 1500, boss: 10000 },
+                extreme: { coin: 500, powerUp: 2000, enemy: 1000, boss: 8000 }
+            };
+            
+            coinInterval = setInterval(createCoin, intervals[difficulty].coin);
+            powerUpInterval = setInterval(createPowerUp, intervals[difficulty].powerUp);
+            enemyInterval = setInterval(createEnemy, intervals[difficulty].enemy);
+            bossInterval = setInterval(createBoss, intervals[difficulty].boss);
+            timer = setTimeout(endGame, gameDuration * 1000);
+            
+            stats.gamesPlayed++;
+            playSound(600, 0.2);
+        }
+
+        function endGame() {
+            gameActive = false;
+            clearInterval(gameInterval);
+            clearInterval(coinInterval);
+            clearInterval(powerUpInterval);
+            clearInterval(enemyInterval);
+            clearInterval(bossInterval);
+            clearTimeout(timer);
+            if (powerUpTimer) clearTimeout(powerUpTimer);
+            
+            coins.forEach(coin => { if (coin.parentNode) coin.parentNode.removeChild(coin); });
+            powerUps.forEach(powerUp => { if (powerUp.parentNode) powerUp.parentNode.removeChild(powerUp); });
+            enemies.forEach(enemy => { if (enemy.parentNode) enemy.parentNode.removeChild(enemy); });
+            bosses.forEach(boss => { if (boss.parentNode) boss.parentNode.removeChild(boss); });
+            particles.forEach(particle => { if (particle.parentNode) particle.parentNode.removeChild(particle); });
+            
+            coins = [];
+            powerUps = [];
+            enemies = [];
+            bosses = [];
+            particles = [];
+            
+            document.removeEventListener('keydown', movePlayer);
+            gameOverDisplay.textContent = `Game Over! Your score: ${score}`;
+            pauseBtn.style.display = 'none';
+            restartBtn.style.display = 'inline-block';
+            
+            stats.totalScore += score;
+            if (score >= 100) unlockAchievement('coinMaster');
+            if (gameDuration >= 30) unlockAchievement('survivor');
+            
+            playSound(300, 0.5);
+        }
+
+        function restartGame() {
+            endGame();
+            startGame();
+        }
+
+        // Initialize
+        showMainMenu();
+    </script>
 </body>
 </html> 
